@@ -21,9 +21,10 @@ class Plotter:
 
 
     def __init__(self, plotfile):
-        self.W = 1000.0
+        self.W = 942.975 # 37.125"
         self.stepLength = .15
-        self.currentLengths = Lengths(600.0,600.0)
+        self.startLengths = Lengths(508.0,508.0)
+        self.currentLengths = Lengths(508.0,508.0)
         self.plotfile = plotfile
         self.pixelsPerStep = .1
 
@@ -32,6 +33,8 @@ class Plotter:
         pencommand = 2 if pendown else 1
 
         p1 = self.pointFromLengths(self.currentLengths)
+        print "drawing from " ,p1, " to ", p2
+
         last = self.currentLengths
 
         dx = p2.x-p1.x
@@ -65,6 +68,9 @@ class Plotter:
             self.currentLengths = Lengths(last.a+sa*self.stepLength,last.b+sb*self.stepLength)
             last = self.currentLengths
             i += step
+
+    def reset(self):
+        self.moveTo(self.startLengths)
 
     def moveTo(self,to):
         print "moving to ", to
