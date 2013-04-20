@@ -1,55 +1,23 @@
-#!/usr/bin/env python
+#!/Usr/bin/env python
 import sys,collections,gc,time
 from math import sqrt,sin,cos,acos,atan2,degrees,fabs,pow,modf,fmod
 import Image,ImageDraw
+from Plotter import Lengths, Point, Plotter
 
+class Plot2Img(Plotter):
 
-class Lengths(collections.namedtuple('lengths',['a','b'])):
-    '''Lengths'''
+    def __init__(self,image,plotfile):
+        Plotter.__init__(self,plotfile)
+        self.image = image
 
-class Point(collections.namedtuple('point',['x','y'])):
-    '''Point'''
-
-def pointFromLengths(W,l):
-    #print "running for ",W," and ",l
-    x = (l.a**2-l.b**2+W**2)/(2*W*l.a)
-    try:
-        al=acos(x)
-        #print "got al = ", degrees(al)
-        return (l.a*cos(al),l.a*sin(al))
-    except (ValueError):
-        if (l.a+l.b)<W:
-            print 'offsetting'
-            return pointFromLengths(W,Lengths(l.a+(l.a+l.b-W),l.b))
-        else:
-            print "ValueError for ",l
-        raise ValueError
-
-
-class VPlotter:
-
-    FWD = 1
-    REV = 2
-    UP =  1
-    DWN = 2
-    NIL = 0
-
-    def __init__(self,image,plotfile,W,steplength):
-        self.startlengths = Lengths(600.0,600.0)
-        self.out = plotfile
-        self.pen = VPlotter.DWN
-        self.f = plotfile
-        self.image=image
-        self.W=W
-        self.steplength=steplength
 
     def draw(self):
 
-        _a = self.startlengths.a
-        _b = self.startlengths.b
+        _a = self.currentLengths.a
+        _b = self.currentLengths.b
 
         while True:
-            c = (self.f.read(1))
+            c = (self.plotfile.read(1))
             if c==b'':
                 break
             b = bytearray(c)[0]
@@ -59,20 +27,20 @@ class VPlotter:
             sa = (b >> 4) & 3
             sb = (b >> 2) & 3
             pen = b & 3
-            if (sa == VPlotter.FWD):
+            if (sa == Plot2Img.FWD):
                 # print "steppera up"
-                _a=_a+self.steplength
-            elif (sa == VPlotter.REV):
+                _a=_a+self.stepLength
+            elif (sa == Plot2Img.REV):
                 # print "steppera down"
-                _a=_a-self.steplength
-            if (sb==VPlotter.FWD):
+                _a=_a-self.stepLength
+            if (sb==Plot2Img.FWD):
                 # print "stepperb up"
-                _b=_b+self.steplength
-            elif (sb==VPlotter.REV):
+                _b=_b+self.stepLength
+            elif (sb==Plot2Img.REV):
                 # print "stepperb down"
-                _b=_b-self.steplength
-            p = pointFromLengths(self.W,Lengths(_a,_b))
-            if pen==VPlotter.DWN:
+                _b=_b-self.stepLength
+            p = self.pointFromLengths(Lengths(_a,_b))
+            if pen==Plot2Img.DWN:
                 self.image.point(p,"#000000")
 
     
@@ -82,7 +50,7 @@ height= 1000
 image = Image.new("RGB",(width,height),"#D0D0D0")
 draw = ImageDraw.Draw(image)
 plotfile = open(sys.argv[1],'rb')
-v = VPlotter(draw,plotfile,1000.0,.15)
+v = Plot2Img(draw,plotfile)
 v.draw()
 
 image.show()
