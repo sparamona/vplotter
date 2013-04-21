@@ -7,7 +7,6 @@ from solenoid import Solenoid
 
 class Driver(Plotter):
 
-
     def __init__(self,steppera,stepperb,solenoid,plotfile,delay):
         Plotter.__init__(self,plotfile)
         self.steppera = steppera
@@ -31,10 +30,10 @@ class Driver(Plotter):
             pen = b & 3
             # print (sa,sb)
             if (pen == Driver.UP):
-                self.solenoid.engage()
-            if (pen == Driver.DWN):
                 self.solenoid.disengage()
-                if (sb==Driver.FWD):
+            if (pen == Driver.DWN):
+                self.solenoid.engage()
+            if (sb==Driver.FWD):
                 # print "stepperb up"
                 self.stepperb.stepup()
             elif (sb==Driver.REV):
@@ -55,7 +54,7 @@ steppera = Stepper(18,22,14,15,25)
 solenoid = Solenoid()
 plotfile = open(sys.argv[1],'rb')
 
-v = Driver(steppera,stepperb,plotfile,0.005)
+v = Driver(steppera,stepperb,solenoid,plotfile,0.004)
 v.run()
 print ("done.")
    

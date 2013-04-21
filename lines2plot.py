@@ -8,11 +8,13 @@ plotfile = open(sys.argv[1],'wb')
 
 v = Plotter(plotfile)
 #v.drawLineTo(v.pointFromLengths(Lengths(v.W+100,v.W+100)),False)
-v.drawLineTo(Point(300.0,500.0),False)
-v.drawLineTo(Point(700.0,500.0),True)
-v.drawLineTo(Point(700.0,400.0),True)
-v.drawLineTo(Point(300.0,400.0),True)
-v.drawLineTo(Point(300.0,500.0),True)
+c = (550.0,380.0)
+for i in range(10,9,-1):
+    v.drawLineTo(Point(c[0]-i,c[1]-i),False)
+    v.drawLineTo(Point(c[0]-i,c[1]+i),True)
+    v.drawLineTo(Point(c[0]+i,c[1]+i),True)
+    v.drawLineTo(Point(c[0]+i,c[1]-i),True)
+    v.drawLineTo(Point(c[0]-i,c[1]-i),True)
 v.reset()
 
 print ("done.")
