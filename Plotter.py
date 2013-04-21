@@ -22,7 +22,7 @@ class Plotter:
 
     def __init__(self, plotfile):
         self.W = 942.975 # 37.125"
-        self.stepLength = .15
+        self.stepLength = .16
         self.startLengths = Lengths(508.0,508.0)
         self.currentLengths = Lengths(508.0,508.0)
         self.plotfile = plotfile
@@ -73,7 +73,7 @@ class Plotter:
         self.moveTo(self.startLengths)
 
     def moveTo(self,to):
-        print "moving to ", to
+        # print "moving to ", to
         steplength=self.stepLength
         fromL=self.currentLengths
         toL=to

@@ -47,7 +47,7 @@ class Plot2Img(Plotter):
 
 width = 1000
 height= 1000
-image = Image.new("RGB",(width,height),"#D0D0D0")
+image = Image.new("RGB",(width,height),"#FFFFFF")
 draw = ImageDraw.Draw(image)
 plotfile = open(sys.argv[1],'rb')
 v = Plot2Img(draw,plotfile)
