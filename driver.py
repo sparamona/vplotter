@@ -3,15 +3,18 @@ import sys,collections,gc,time
 from math import sqrt,sin,cos,acos,atan2,degrees,fabs,pow,modf,fmod
 from stepper import Stepper
 from Plotter import Lengths, Point, Plotter
+from solenoid import Solenoid
 
 class Driver(Plotter):
 
 
-    def __init__(self,steppera,stepperb,plotfile,delay):
+    def __init__(self,steppera,stepperb,solenoid,plotfile,delay):
         Plotter.__init__(self,plotfile)
         self.steppera = steppera
         self.stepperb = stepperb
+        self.solenoid = solenoid
         self.delay = delay
+
 
     def run(self):
 
@@ -27,7 +30,11 @@ class Driver(Plotter):
             sb = (b >> 2) & 3
             pen = b & 3
             # print (sa,sb)
-            if (sb==Driver.FWD):
+            if (pen == Driver.UP):
+                self.solenoid.engage()
+            if (pen == Driver.DWN):
+                self.solenoid.disengage()
+                if (sb==Driver.FWD):
                 # print "stepperb up"
                 self.stepperb.stepup()
             elif (sb==Driver.REV):
@@ -45,6 +52,7 @@ class Driver(Plotter):
 
 stepperb = Stepper(18,4,17,23,24)
 steppera = Stepper(18,22,14,15,25)
+solenoid = Solenoid()
 plotfile = open(sys.argv[1],'rb')
 
 v = Driver(steppera,stepperb,plotfile,0.005)
