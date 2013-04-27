@@ -9,6 +9,7 @@ class Plot2Img(Plotter):
     def __init__(self,image,plotfile):
         Plotter.__init__(self,plotfile)
         self.image = image
+        self.color = "#000000"
 
 
     def draw(self):
@@ -21,12 +22,22 @@ class Plot2Img(Plotter):
             if c==b'':
                 break
             b = bytearray(c)[0]
-        
 
             # print "read ", b
+            command = (b >> 6) & 3
             sa = (b >> 4) & 3
             sb = (b >> 2) & 3
             pen = b & 3
+            if (command == Plot2Img.COLOR):
+                if (pen==Plot2Img.RED):
+                    self.color = "#FF0000"
+                if (pen==Plot2Img.BLUE):
+                    self.color = "#0000FF"
+                if (pen==Plot2Img.GREEN):
+                    self.color = "#00FF00"
+                if (pen==Plot2Img.BLACK):
+                    self.color = "#000000"
+                continue
             if (sa == Plot2Img.FWD):
                 # print "steppera up"
                 _a=_a+self.stepLength
@@ -41,7 +52,7 @@ class Plot2Img(Plotter):
                 _b=_b-self.stepLength
             p = self.pointFromLengths(Lengths(_a,_b))
             if pen==Plot2Img.DWN:
-                self.image.point(p,"#000000")
+                self.image.point(p,self.color)
 
     
 
@@ -53,7 +64,7 @@ plotfile = open(sys.argv[1],'rb')
 v = Plot2Img(draw,plotfile)
 v.draw()
 
-image.show()
-#image.save("out.png","PNG")
+#image.show()
+image.save("out.png","PNG")
 print ("done.")
    

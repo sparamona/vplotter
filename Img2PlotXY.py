@@ -19,48 +19,67 @@ class Img2Plot(Plotter):
         Plotter.__init__(self,plotfile)
         self.im = Image.open(sourcefile)
         self.im = self.im.convert("L")
+        
 
-   
-    def sweep(self, mode, offset, bbox, plotarea, direction, rgb, vrange, color,density,range_offset):
+    def sweep(self, mode, offset, bbox, plotarea, direction, rgb, vrange, color):
        colorcommand = (Plotter.COLOR<<6) + color
-       self.plotfile.write(chr(colorcommand))        
+       #self.plotfile.write(chr(colorcommand))        
+
        if (mode==MODES.top) or (mode==MODES.bottom):
-           r=range(bbox[0],bbox[2],density)
-       elif (mode==MODES.left) or (mode==MODES.right):
-           r=range(bbox[1]+range_offset,bbox[3],density)
+           r=range(bbox[0],bbox[2],6)
+       elif (mode==MODES.right):
+           r=range(bbox[1]+5,bbox[3],6)
+       elif (mode==MODES.left):
+           r=range(bbox[1]+7,bbox[3],6)
 
        for i in r:
             sys.stdout.write('.')
             sys.stdout.flush()
+
             if mode==MODES.top:
                 movetop = Point(i,offset.y+1)
-            elif mode==MODES.bottom:
-                movetop = Point(i,bbox[3]-1)
             elif mode==MODES.left:
                 movetop = Point(offset.x+1,i)
             elif mode==MODES.right:
                 movetop = Point(bbox[2]-1,i)
             self.moveTo(self.lengthsFromPoint(movetop))
             l = self.currentLengths
+            precise = movetop
+
             state = 0
 
             lastWrittenLength=self.currentLengths
             writeLength = 0
             commands = []
-            stepa = direction[0] if direction[0]>=0 else 2
-            stepb = direction[1] if direction[1]>=0 else 2
+
 
             while True:
                 # now add keep adding steps, and use penup/pendown
-                l=Lengths(l.a+direction[0]*self.stepLength,l.b+direction[1]*self.stepLength)
-                p = self.pointFromLengths(l)
-                #print "at point ",p
-                if state==2 or (inbox(p,plotarea)==False):
-                    # print "break", len(commands), plotarea, p, l
+                #l=Lengths(l.a+direction[0]*self.stepLength,l.b+direction[1]*self.stepLength)
+                #p = self.pointFromLengths(l)
+                precise = Point(precise.x+direction[0]*self.stepLength/2,precise.y+direction[1]*self.stepLength/2)
+                # do I step?
+                precisel = self.lengthsFromPoint(precise)
+                da = precisel.a-l.a
+                db = precisel.b-l.b
+
+                stepa = 0
+                stepb = 0
+
+                if fabs(da)>self.stepLength:
+                    stepa = 1 if da >= 0 else -1
+                if fabs(db)>self.stepLength:
+                    stepb = 1 if db >= 0 else -1
+                # b = ((2 if stepa<0 else stepa) << 4) + ((2 if stepb<0 else stepb)<<2 + pencommand
+                # p = self.pointFromLengths(l)
+                # print "at point ",p
+                l = Lengths(l.a+stepa*self.stepLength,l.b+stepb*self.stepLength)
+
+                if state==2 or (inbox(precise,plotarea)==False):
                     break
                 try: 
-                    if inbox(p,bbox):
-                        pix = self.im.getpixel((p.x-offset.x,p.y-offset.y))
+                    if inbox(precise,bbox):
+                        pix = self.im.getpixel((precise.x-offset.x,precise.y-offset.y))
                         #print pix
                         #pencommand = 2 if (pix[rgb]>vrange[0] and pix[rgb]<=vrange[1]) else 1
                         pencommand = 2 if (pix>vrange[0] and pix<=vrange[1]) else 1
@@ -69,7 +88,7 @@ class Img2Plot(Plotter):
                         pencommand=1
                         if state==1:
                             state=2
-                    b = (stepa<<4) + (stepb<<2) +  pencommand
+                    b = ((2 if stepa<0 else stepa) <<4) + ((2 if stepb<0 else stepb) <<2) +  pencommand
                     # self.plotfile.write(chr(b))
                     commands.append(b)
                     if (pencommand==2):
@@ -89,7 +108,7 @@ class Img2Plot(Plotter):
     def draw(self):
 
         # fix b first
-        margin = 200
+        margin = 270  # That leaves a page of roughly 500x500
         offset = Point(margin,margin)
         plotarea = (margin,margin,int(self.W-margin),int(self.W-margin))
 
@@ -99,19 +118,23 @@ class Img2Plot(Plotter):
                 min(plotarea[3],self.im.getbbox()[3]+offset.y))
         print bbox
 
-#        self.sweep(MODES.top, offset,bbox, plotarea, (1,1),0,(127,255), Plotter.RED)
-#        self.sweep(MODES.top, offset,bbox, plotarea, (1,0),1, (127,255), Plotter.GREEN)
-#        self.sweep(MODES.left, offset,bbox, plotarea, (1,0),1,(127,255), Plotter.GREEN)
-#        self.sweep(MODES.top, offset,bbox, plotarea, (0,1),2,(127,255), Plotter.BLUE)
-#        self.sweep(MODES.right, offset,bbox, plotarea, (0,1),2,(127,255), Plotter.BLUE)
 
-        self.sweep(MODES.top, offset,bbox, plotarea, (1,1),0,(0,80), Plotter.BLACK,4,4)
-        self.sweep(MODES.top, offset,bbox, plotarea, (1,0),0, (0,140), Plotter.BLACK,4,4)
-        self.sweep(MODES.left, offset,bbox, plotarea, (1,0),0,(0,140), Plotter.BLACK,9,4)
-        self.sweep(MODES.left, offset,bbox, plotarea, (1,-1),0,(0,170), Plotter.BLACK,4,4)
-        self.sweep(MODES.top, offset,bbox, plotarea, (1,-1),0,(0,170), Plotter.BLACK,18,4)
-        self.sweep(MODES.top, offset,bbox, plotarea, (0,1),0,(0,200), Plotter.BLACK,4,4)
-        self.sweep(MODES.right, offset,bbox, plotarea, (0,1),0,(0,200), Plotter.BLACK,9,8) # 4 for ANS, 8 for VB
+        #diagonal top left -> bottom right
+        self.sweep(MODES.left, offset,bbox, plotarea, (1,1),0, (0,200), Plotter.BLACK)
+        self.sweep(MODES.top, offset,bbox, plotarea,  (1,1),0, (0,200), Plotter.BLACK)
+
+        #diagonal top right -> bottom left
+        self.sweep(MODES.right, offset,bbox, plotarea, (-1,1),0,(0,170), Plotter.BLACK)
+        self.sweep(MODES.top, offset,bbox, plotarea,   (-1,1),0,(0,170), Plotter.BLACK)
+
+
+        # horizontal
+        self.sweep(MODES.left, offset,bbox, plotarea, (1,0),0,(0,140), Plotter.BLACK)
+
+
+        # vertical
+        self.sweep(MODES.top, offset,bbox, plotarea, (0,1),0,(0,80), Plotter.BLACK)
+
         return
 
 

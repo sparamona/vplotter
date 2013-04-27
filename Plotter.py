@@ -12,12 +12,28 @@ class Point(collections.namedtuple('point',['x','y'])):
 
 class Plotter:
 
+    #PEN
+    #F000
+    COLOR = 1
+    DRAW = 0
+
+    
+    #left = 0F00, right = 00F0
     FWD = 1
     REV = 2
+
+    #pen position
+    #000F
     UP =  1
     DWN = 2
     NIL = 0
 
+    #pen color
+    #000F
+    RED = 0
+    GREEN = 1
+    BLUE = 2 
+    BLACK = 3
 
 
     def __init__(self, plotfile):
