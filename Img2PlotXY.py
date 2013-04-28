@@ -19,28 +19,43 @@ class Img2Plot(Plotter):
         Plotter.__init__(self,plotfile)
         self.im = Image.open(sourcefile)
         self.im = self.im.convert("L")
-        
 
-    def sweep(self, mode, offset, bbox, plotarea, direction, rgb, vrange, color):
+    def swapMode(self,mode):
+        if mode==MODES.top:
+            return MODES.bottom
+        if mode==MODES.bottom:
+            return MODES.top
+        if mode==MODES.left:
+            return MODES.right
+        if mode==MODES.right:
+            return MODES.left
+
+
+    def sweep(self, mode, offset, bbox, plotarea, _direction, rgb, vrange, color):
        colorcommand = (Plotter.COLOR<<6) + color
        #self.plotfile.write(chr(colorcommand))        
 
        if (mode==MODES.top) or (mode==MODES.bottom):
-           r=range(bbox[0],bbox[2],6)
+           r=range(bbox[0],bbox[2],5)
        elif (mode==MODES.right):
-           r=range(bbox[1]+5,bbox[3],6)
+           r=range(bbox[1]+5,bbox[3],5)
        elif (mode==MODES.left):
-           r=range(bbox[1]+7,bbox[3],6)
+           r=range(bbox[1]+7,bbox[3],5)
+
+       modefwd = True
 
        for i in r:
             sys.stdout.write('.')
             sys.stdout.flush()
 
-            if mode==MODES.top:
+            m = mode if modefwd==True else self.swapMode(mode)
+            if m==MODES.top:
                 movetop = Point(i,offset.y+1)
-            elif mode==MODES.left:
+            elif m==MODES.bottom:
+                movetop = Point(i,bbox[3]-1)
+            elif m==MODES.left:
                 movetop = Point(offset.x+1,i)
-            elif mode==MODES.right:
+            elif m==MODES.right:
                 movetop = Point(bbox[2]-1,i)
             self.moveTo(self.lengthsFromPoint(movetop))
             l = self.currentLengths
@@ -52,6 +67,7 @@ class Img2Plot(Plotter):
             writeLength = 0
             commands = []
 
+            direction = _direction if modefwd else (_direction[0]*-1,_direction[1]*-1)
 
             while True:
                 # now add keep adding steps, and use penup/pendown
@@ -102,15 +118,16 @@ class Img2Plot(Plotter):
             self.currentLengths=lastWrittenLength
             for c in commands[0:writeLength]:
                 self.plotfile.write(chr(c))
+            # modefwd = not modefwd
 
         
 
     def draw(self):
 
         # fix b first
-        margin = 270  # That leaves a page of roughly 500x500
-        offset = Point(margin,margin)
-        plotarea = (margin,margin,int(self.W-margin),int(self.W-margin))
+        
+        offset = Point(250,300)
+        plotarea = (offset.x,offset.y,int(self.W-offset.x),int(self.W-250))
 
         bbox = (max(plotarea[0],offset.x),
                 max(plotarea[1],offset.y),
@@ -134,6 +151,7 @@ class Img2Plot(Plotter):
 
         # vertical
         self.sweep(MODES.top, offset,bbox, plotarea, (0,1),0,(0,80), Plotter.BLACK)
+
 
         return
 
