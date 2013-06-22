@@ -49,7 +49,7 @@ class Plotter:
         pencommand = 2 if pendown else 1
 
         p1 = self.pointFromLengths(self.currentLengths)
-        print "drawing from " ,p1, " to ", p2
+        #print "drawing from " ,p1, " to ", p2
 
         last = self.currentLengths
 
