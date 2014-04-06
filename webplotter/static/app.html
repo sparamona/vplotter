@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<html>
+
+  <head>
+
+
+    <script src="jquery-1.11.0.min.js"></script>
+    <script src="jquery.ajaxQueue.min.js"></script>
+    <script>
+      jQuery.ajaxQueue({
+             url: "/reset",
+             dataType: "json"
+      });
+    </script>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+	  canvas {
+		border: 3px dashed blue;
+	  }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="692" height="350"></canvas>
+    <p/>
+    <button onclick="MODE=FREE;">Freehand</button>
+    <button onclick="MODE=POLY;">Lines</button>
+
+    <script>
+
+      var XOFFSET = 250;
+      var YOFFSET = 300;
+      var FREE = 1;
+      var POLY = 2;
+
+      MODE = FREE;
+
+      function plotter(cmd,x,y) {
+          var url = "/"+cmd+"/"+(x+XOFFSET)+"/"+(y+YOFFSET);
+          jQuery.ajaxQueue({
+             url: url,
+             dataType: "json"
+          });
+      }
+
+      function writeMessage(canvas, message) {
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.font = '18pt Calibri';
+        context.fillStyle = 'black';
+        context.fillText(message, 10, 25);
+      }
+      function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+	  var mousedown = false;
+	  
+      canvas.addEventListener('mousemove', function(evt) {
+        var mousePos = getMousePos(canvas, evt);
+        var message = (mousedown?'draw':'move') + ' position: ' + mousePos.x + ',' + mousePos.y;
+        //writeMessage(canvas, message);
+        if (mousedown && MODE==FREE) { 
+          context.lineTo(mousePos.x,mousePos.y);
+          context.stroke();
+          plotter("draw",mousePos.x,mousePos.y);
+        }
+      }, false);
+	  
+      canvas.addEventListener('mousedown', function(evt) {
+        /* MoveTo */
+        var mousePos = getMousePos(canvas, evt);
+        console.log("moveto: " + mousePos.x + "," + mousePos.y);
+        context.moveTo(mousePos.x,mousePos.y);
+        plotter("move",mousePos.x,mousePos.y);
+        mousedown = true;
+      }, false);
+	  
+      canvas.addEventListener('mouseup', function(evt) {
+        mousedown = false;
+        if (MODE == POLY) {
+         var mousePos = getMousePos(canvas, evt);
+         context.lineTo(mousePos.x,mousePos.y);
+         context.stroke();
+         plotter("draw",mousePos.x,mousePos.y);
+        }
+      }, false);	  
+    </script>
+
+  </body>
+</html>
