@@ -37,10 +37,13 @@ class Plotter:
 
 
     def __init__(self, plotfile):
-        self.W = 942.975 # 37.125"
-        self.stepLength = .16
-        self.startLengths = Lengths(508.0,508.0)
-        self.currentLengths = Lengths(508.0,508.0)
+        #self.W = 942.975                                # 37.125"  -- distance between the motor points, 25.40 pixels per inch
+        self.W = 1219.2
+        self.stepLength = .16                           # distance the belt moves per step      
+        #self.startLengths = Lengths(508.0,508.0)        # Starting point (arbitrary, but should be roughly correct)
+        self.startLengths = Lengths(700.0,700.0)        # Starting point (arbitrary, but should be roughly correct)
+        #self.currentLengths = Lengths(508.0,508.0)  
+        self.currentLengths = self.startLengths
         self.plotfile = plotfile
         self.pixelsPerStep = .1
 
@@ -79,7 +82,7 @@ class Plotter:
             try:
                 self.plotfile.write(chr(b))
             except (ValueError):
-                print "got value error writing ", b
+                print("got value error writing: %s " % b)
                 raise ValueError
             self.currentLengths = Lengths(last.a+sa*self.stepLength,last.b+sb*self.stepLength)
             last = self.currentLengths
@@ -140,10 +143,10 @@ class Plotter:
             return Point(l.a*cos(al),l.a*sin(al))
         except (ValueError):
             if (l.a+l.b)<self.W:
-                print 'offsetting'
+                print('offsetting')
                 return self.pointFromLengths(Lengths(l.a+(l.a+l.b-self.W),l.b))
             else:
-                print "ValueError for ",l
+                print("ValueError for %s" & l)
                 raise ValueError
 
         

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import sys,collections,gc,time,Image
+import sys,collections,gc,time
 from math import sqrt,sin,cos,acos,atan2,degrees,fabs,pow,modf,fmod
 from Plotter import Lengths,Point,Plotter
+from PIL import Image, ImageEnhance
 
 def inbox(p,box):
     return (p.x>=box[0]) and (p.x<=box[2]) and (p.y>=box[1]) and (p.y<=box[3])
@@ -66,7 +67,7 @@ class MODES:
 
 class Img2Plot(Plotter):
 
-    def __init__(self,image,plotfile,plotarea,shadescale):
+    def __init__(self,image,plotfile,plotarea,shadelevels):
         Plotter.__init__(self,plotfile)
 
         # set up
@@ -75,12 +76,20 @@ class Img2Plot(Plotter):
         self.image = image
         self.scaleImage()
       
-        shadelevels = self.detectShades(shadescale)
-        print "auto leveled for ", shadescale, " to ", shadelevels
-        self.shades = { MODES.EW: (0,int(shadelevels[0])),  #70
-           MODES.NS: (0,int(shadelevels[1])), #100
-           MODES.NWSE: (0,int(shadelevels[2])), #150
-           MODES.NESW: (0,int(shadelevels[3]))} #195
+        #shadelevels = self.detectShades(1.0)
+        #print ("auto leveled for %s" % (shadelevels))
+        #shadelevels = [52,88,150,200]
+        #shadelevels = [88,118,150,200]
+        print ("overriding with for %s" % (shadelevels))
+        minshade = 0
+        
+        print ("auto leveled for %s" % (shadelevels))
+
+        self.shades = { 
+            MODES.EW: (minshade,int(shadelevels[0])),  
+            MODES.NS: (minshade,int(shadelevels[1])), 
+            MODES.NWSE: (minshade,int(shadelevels[2])), 
+            MODES.NESW: (minshade,int(shadelevels[3]))} 
 
         #self.image.save("out.png","PNG")
         
@@ -94,15 +103,18 @@ class Img2Plot(Plotter):
             # scale by the smallest
             scale = min(scaleDims)
             self.image = image.resize((int(scale*dims[0]),int(scale*dims[1])))
-            print "scaling to ", scale
+            print("scaling to %s" % scale)
         else:
             self.image = image
         self.image = self.image.convert("L")
+        #self.image = ImageEnhance.Contrast(self.image).enhance(contrast)
+        #self.image = ImageEnhance.Brightness(self.image).enhance(brightness)
+         
         self.imageArea = (self.plotarea[0],self.plotarea[1],
                           min(self.plotarea[2],self.image.getbbox()[2]+self.plotarea[0]),
                           min(self.plotarea[3],self.image.getbbox()[3]+self.plotarea[1]))
-        print self.imageArea
-        print self.image.getbbox()
+        print(self.imageArea)
+        print(self.image.getbbox())
 
     def detectShades(self,scale):
         bbox = self.image.getbbox()
@@ -118,7 +130,10 @@ class Img2Plot(Plotter):
                 total = total+pix
         total = total*scale
         shades = []
-        for i in [total/4.0, total/2, 3*total/4, total]:
+
+        skews = [.25, .5, .75, 1]
+
+        for i in [total*skews[0], total*skews[1], total*skews[2], total*skews[3]]:
             integral = 0
             for k in histogram:
                 value = histogram[k]
@@ -132,8 +147,11 @@ class Img2Plot(Plotter):
 
         
     def draw(self):
-        allmodes = [MODES.NWSE,MODES.NESW,MODES.EW,MODES.NS]
+        #allmodes = [MODES.NWSE,MODES.NESW,MODES.EW,MODES.NS]
+        allmodes = [MODES.EW,MODES.NS,MODES.NWSE, MODES.NESW]
+        #allmodes = [MODES.NWSE,MODES.NS, MODES.NS]
         #allmodes = [MODES.EW]
+        #allmodes = [MODES.EW, MODES.NWSE]
         for m in allmodes:
             self.sweep(m)
         return
@@ -144,7 +162,7 @@ class Img2Plot(Plotter):
         for i in r:
             commands = self.sweep1(mode,i)
             fwd = self.write(commands,fwd)
-        print "done sweeping"
+        print("done sweeping")
         return
 
 
@@ -221,15 +239,18 @@ class Img2Plot(Plotter):
 # MAIN
 #
 
-sourcefile = open(sys.argv[1])
-plotfile = open(sys.argv[2],'wb')
-shadescale = float(sys.argv[3])
-#shadelevels = [70,100,150,195]
+sourcefile = sys.argv[1]
+plotfile = open(sys.argv[2],'w')
+shadelevels = [float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6])]
+
+
 image = Image.open(sourcefile)
-plotarea = (250,300,942-250,650)
+margins = [ 250, 250, 250, 300] # left, top, right down
+totalarea = (1200, 1700)
+plotarea = (margins[0],margins[1],totalarea[0]-margins[2],totalarea[1]-margins[3])
 
 
-v = Img2Plot(image,plotfile,plotarea,shadescale)
+v = Img2Plot(image,plotfile,plotarea, shadelevels)
 #shadelevels = v.detectShades(float(shadescale))
 
 v.draw()
