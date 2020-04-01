@@ -81,15 +81,14 @@ class Img2Plot(Plotter):
         #shadelevels = [52,88,150,200]
         #shadelevels = [88,118,150,200]
         print ("overriding with for %s" % (shadelevels))
-        minshade = 0
         
         print ("auto leveled for %s" % (shadelevels))
 
         self.shades = { 
-            MODES.EW: (minshade,int(shadelevels[0])),  
-            MODES.NS: (minshade,int(shadelevels[1])), 
-            MODES.NWSE: (minshade,int(shadelevels[2])), 
-            MODES.NESW: (minshade,int(shadelevels[3]))} 
+            MODES.EW:   int(shadelevels[0]),  
+            MODES.NS:   int(shadelevels[1]), 
+            MODES.NWSE: int(shadelevels[2]), 
+            MODES.NESW: int(shadelevels[3])} 
 
         #self.image.save("out.png","PNG")
         
@@ -106,7 +105,7 @@ class Img2Plot(Plotter):
             print("scaling to %s" % scale)
         else:
             self.image = image
-        self.image = self.image.convert("L")
+        self.image = self.image.convert("CMYK")
         #self.image = ImageEnhance.Contrast(self.image).enhance(contrast)
         #self.image = ImageEnhance.Brightness(self.image).enhance(brightness)
          
@@ -116,33 +115,6 @@ class Img2Plot(Plotter):
         print(self.imageArea)
         print(self.image.getbbox())
 
-    def detectShades(self,scale):
-        bbox = self.image.getbbox()
-        total = 0
-        histogram = {}
-        for x in range(0,bbox[2],5):
-            for y in range(0,bbox[3],5):
-                pix = self.image.getpixel((x,y))
-                if pix in histogram:
-                    histogram[pix] = 1+histogram[pix]
-                else:
-                    histogram[pix] = 1
-                total = total+pix
-        total = total*scale
-        shades = []
-
-        skews = [.25, .5, .75, 1]
-
-        for i in [total*skews[0], total*skews[1], total*skews[2], total*skews[3]]:
-            integral = 0
-            for k in histogram:
-                value = histogram[k]
-                integral = integral+value*k
-                if integral>=i:
-                    shades.append(k)
-                    break
-        return shades
-                
             
 
         
@@ -152,15 +124,16 @@ class Img2Plot(Plotter):
         #allmodes = [MODES.NWSE,MODES.NS, MODES.NS]
         #allmodes = [MODES.EW]
         #allmodes = [MODES.EW, MODES.NWSE]
-        for m in allmodes:
-            self.sweep(m)
+        for colori in [0,1,2,3]:  # C M Y K
+            self.changeColor(colori)
+            self.sweep(allmodes[colori],colori)
         return
 
-    def sweep(self,mode):
+    def sweep(self,mode, colori):
         r = MODES.range(mode,self.imageArea,self.spacing)
         fwd = True
         for i in r:
-            commands = self.sweep1(mode,i)
+            commands = self.sweep1(mode,i,colori)
             fwd = self.write(commands,fwd)
         print("done sweeping")
         return
@@ -181,7 +154,7 @@ class Img2Plot(Plotter):
         return not(fwd)
         
 
-    def sweep1(self,mode,i):
+    def sweep1(self,mode,i, colori):
 
         def inbox(p):
             return ((p.x>=self.imageArea[0]) and (p.x<self.imageArea[2])) and ((p.y>=self.imageArea[1]) and (p.y<self.imageArea[3]))
@@ -193,7 +166,7 @@ class Img2Plot(Plotter):
         delta = (MODES.stepDelta(mode)[0]*self.stepLength/2.0,
                  MODES.stepDelta(mode)[1]*self.stepLength/2.0)
         offset = Point(self.imageArea[0],self.imageArea[1])
-        vrange = self.shades[mode]
+        threshhold = self.shades[mode]
         state = 0
         #print p
         inline = False
@@ -209,8 +182,8 @@ class Img2Plot(Plotter):
             elif (state==1) and not(_inbox):
                 break
             if _inbox:
-                pix = self.image.getpixel((p.x-offset.x,p.y-offset.y))
-                pencommand = 2 if (pix>vrange[0] and pix<=vrange[1]) else 1
+                pix = self.image.getpixel((p.x-offset.x,p.y-offset.y))[colori]
+                pencommand = 2 if (pix>threshhold) else 1
                 if (pencommand==2 and inline==False):
                     # now check to see if the last line was within 2 steps max(X,Y)
                     _from=p

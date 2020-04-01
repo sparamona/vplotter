@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import sys,collections,gc,time,Image
+import sys,collections,gc,time
+from PIL import Image
 from math import sqrt,sin,cos,acos,atan2,degrees,fabs,pow,modf,fmod
 from Plotter import Lengths,Point,Plotter
 
@@ -17,6 +18,7 @@ class Img2Plot(Plotter):
 
     def __init__(self,sourcefile,plotfile):
         Plotter.__init__(self,plotfile)
+        print("opening sourcefile %s" % sourcefile)
         self.im = Image.open(sourcefile)
         self.im = self.im.convert("L")
 
@@ -77,7 +79,7 @@ class Img2Plot(Plotter):
                         lastWrittenLength = l
                     self.currentLengths=l
                 except (IndexError):
-                    print "got index error on pixel ",p
+                    print("got index error on pixel: %s " % p)
                     raise IndexError
             # now write out the buffer, and set the currentLengths
             self.currentLengths=lastWrittenLength
@@ -97,7 +99,7 @@ class Img2Plot(Plotter):
                 max(plotarea[1],offset.y),
                 min(plotarea[2],self.im.getbbox()[2]+offset.x),
                 min(plotarea[3],self.im.getbbox()[3]+offset.y))
-        print bbox
+        print(bbox)
 
 #        self.sweep(MODES.top, offset,bbox, plotarea, (1,1),0,(127,255), Plotter.RED)
 #        self.sweep(MODES.top, offset,bbox, plotarea, (1,0),1, (127,255), Plotter.GREEN)
@@ -115,8 +117,9 @@ class Img2Plot(Plotter):
         return
 
 
-sourcefile = open(sys.argv[1])
-plotfile = open(sys.argv[2],'wb')
+#sourcefile = open(sys.argv[1])
+sourcefile = sys.argv[1]
+plotfile = open(sys.argv[2],'w')
 
 #image = Image.new("RGB",(1000,1000),"#FFFFFF")
 #draw = ImageDraw.Draw(image)

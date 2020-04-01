@@ -12,37 +12,50 @@ class Point(collections.namedtuple('point',['x','y'])):
 
 class Plotter:
 
-    #PEN
+    #COMMAND
     #F000
-    COLOR = 1
-    DRAW = 0
+    COLOR = 1  # Change color command
+    DRAW = 0   # Draw (or move)
 
     
+    #Motor commands for A and B motors
     #left = 0F00, right = 00F0
     FWD = 1
     REV = 2
 
-    #pen position
+    #pen position when command = DRAW
     #000F
     UP =  1
     DWN = 2
     NIL = 0
 
-    #pen color
+    #pen color in the final 4 bits when command = COLOR
     #000F
-    RED = 0
-    GREEN = 1
-    BLUE = 2 
+    CYAN = 0
+    MAGENTA = 1
+    YELLOW = 2 
     BLACK = 3
 
 
     def __init__(self, plotfile):
-        self.W = 942.975 # 37.125"
-        self.stepLength = .16
-        self.startLengths = Lengths(508.0,508.0)
-        self.currentLengths = Lengths(508.0,508.0)
+        #self.W = 942.975                                # 37.125"  -- distance between the motor points, 25.40 pixels per inch
+        self.W = 1219.2
+        self.stepLength = .16                           # distance the belt moves per step      
+        #self.startLengths = Lengths(508.0,508.0)        # Starting point (arbitrary, but should be roughly correct)
+        self.startLengths = Lengths(700.0,700.0)        # Starting point (arbitrary, but should be roughly correct)
+        #self.currentLengths = Lengths(508.0,508.0)  
+        self.currentLengths = self.startLengths
         self.plotfile = plotfile
         self.pixelsPerStep = .1
+
+    def changeColor(self, color):
+        print("calling change color %d" % color)
+        b = (1 << 6) + color
+        try:
+           self.plotfile.write(chr(b))
+        except (ValueError):
+           print("got value error writing: %s " % b)
+           raise ValueError
 
 
     def drawLineTo(self,p2,pendown):
@@ -79,7 +92,7 @@ class Plotter:
             try:
                 self.plotfile.write(chr(b))
             except (ValueError):
-                print "got value error writing ", b
+                print("got value error writing: %s " % b)
                 raise ValueError
             self.currentLengths = Lengths(last.a+sa*self.stepLength,last.b+sb*self.stepLength)
             last = self.currentLengths
@@ -140,10 +153,10 @@ class Plotter:
             return Point(l.a*cos(al),l.a*sin(al))
         except (ValueError):
             if (l.a+l.b)<self.W:
-                print 'offsetting'
+                print('offsetting')
                 return self.pointFromLengths(Lengths(l.a+(l.a+l.b-self.W),l.b))
             else:
-                print "ValueError for ",l
+                print("ValueError for %s" & l)
                 raise ValueError
 
         

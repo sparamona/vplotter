@@ -67,7 +67,7 @@ class MODES:
 
 class Img2Plot(Plotter):
 
-    def __init__(self,image,plotfile,plotarea,shadelevels):
+    def __init__(self,image,plotfile,plotarea):
         Plotter.__init__(self,plotfile)
 
         # set up
@@ -80,19 +80,9 @@ class Img2Plot(Plotter):
         #print ("auto leveled for %s" % (shadelevels))
         #shadelevels = [52,88,150,200]
         #shadelevels = [88,118,150,200]
-        print ("overriding with for %s" % (shadelevels))
-        minshade = 0
-        
-        print ("auto leveled for %s" % (shadelevels))
 
-        self.shades = { 
-            MODES.EW: (minshade,int(shadelevels[0])),  
-            MODES.NS: (minshade,int(shadelevels[1])), 
-            MODES.NWSE: (minshade,int(shadelevels[2])), 
-            MODES.NESW: (minshade,int(shadelevels[3]))} 
+        startingpoint = [700,700]
 
-        #self.image.save("out.png","PNG")
-        
 
     def scaleImage(self):
         bbox = self.image.getbbox()
@@ -115,35 +105,6 @@ class Img2Plot(Plotter):
                           min(self.plotarea[3],self.image.getbbox()[3]+self.plotarea[1]))
         print(self.imageArea)
         print(self.image.getbbox())
-
-    def detectShades(self,scale):
-        bbox = self.image.getbbox()
-        total = 0
-        histogram = {}
-        for x in range(0,bbox[2],5):
-            for y in range(0,bbox[3],5):
-                pix = self.image.getpixel((x,y))
-                if pix in histogram:
-                    histogram[pix] = 1+histogram[pix]
-                else:
-                    histogram[pix] = 1
-                total = total+pix
-        total = total*scale
-        shades = []
-
-        skews = [.25, .5, .75, 1]
-
-        for i in [total*skews[0], total*skews[1], total*skews[2], total*skews[3]]:
-            integral = 0
-            for k in histogram:
-                value = histogram[k]
-                integral = integral+value*k
-                if integral>=i:
-                    shades.append(k)
-                    break
-        return shades
-                
-            
 
         
     def draw(self):

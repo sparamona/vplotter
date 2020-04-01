@@ -1,8 +1,9 @@
 #!/Usr/bin/env python
 import sys,collections,gc,time
 from math import sqrt,sin,cos,acos,atan2,degrees,fabs,pow,modf,fmod
-import Image,ImageDraw
 from Plotter import Lengths, Point, Plotter
+from PIL import Image, ImageDraw
+
 
 class Plot2Img(Plotter):
 
@@ -29,12 +30,12 @@ class Plot2Img(Plotter):
             sb = (b >> 2) & 3
             pen = b & 3
             if (command == Plot2Img.COLOR):
-                if (pen==Plot2Img.RED):
-                    self.color = "#FF0000"
-                if (pen==Plot2Img.BLUE):
-                    self.color = "#0000FF"
-                if (pen==Plot2Img.GREEN):
-                    self.color = "#00FF00"
+                if (pen==Plot2Img.CYAN):
+                    self.color = "#00FFFF"
+                if (pen==Plot2Img.MAGENTA):
+                    self.color = "#FF00FF"
+                if (pen==Plot2Img.YELLOW):
+                    self.color = "#FFFF00"
                 if (pen==Plot2Img.BLACK):
                     self.color = "#000000"
                 continue
@@ -56,8 +57,8 @@ class Plot2Img(Plotter):
 
     
 
-width = 1000
-height= 1000
+width = 1200
+height= 1700
 image = Image.new("RGB",(width,height),"#FFFFFF")
 draw = ImageDraw.Draw(image)
 plotfile = open(sys.argv[1],'rb')
@@ -65,6 +66,6 @@ v = Plot2Img(draw,plotfile)
 v.draw()
 
 #image.show()
-image.save("out.png","PNG")
+image.save(sys.argv[2],"PNG")
 print ("done.")
    
