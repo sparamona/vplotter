@@ -30,12 +30,12 @@ class Plot2Img(Plotter):
             sb = (b >> 2) & 3
             pen = b & 3
             if (command == Plot2Img.COLOR):
-                if (pen==Plot2Img.RED):
-                    self.color = "#FF0000"
-                if (pen==Plot2Img.BLUE):
-                    self.color = "#0000FF"
-                if (pen==Plot2Img.GREEN):
-                    self.color = "#00FF00"
+                if (pen==Plot2Img.CYAN):
+                    self.color = "#00FFFF"
+                if (pen==Plot2Img.MAGENTA):
+                    self.color = "#FF00FF"
+                if (pen==Plot2Img.YELLOW):
+                    self.color = "#FFFF00"
                 if (pen==Plot2Img.BLACK):
                     self.color = "#000000"
                 continue

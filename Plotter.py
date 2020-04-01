@@ -12,27 +12,28 @@ class Point(collections.namedtuple('point',['x','y'])):
 
 class Plotter:
 
-    #PEN
+    #COMMAND
     #F000
-    COLOR = 1
-    DRAW = 0
+    COLOR = 1  # Change color command
+    DRAW = 0   # Draw (or move)
 
     
+    #Motor commands for A and B motors
     #left = 0F00, right = 00F0
     FWD = 1
     REV = 2
 
-    #pen position
+    #pen position when command = DRAW
     #000F
     UP =  1
     DWN = 2
     NIL = 0
 
-    #pen color
+    #pen color in the final 4 bits when command = COLOR
     #000F
-    RED = 0
-    GREEN = 1
-    BLUE = 2 
+    CYAN = 0
+    MAGENTA = 1
+    YELLOW = 2 
     BLACK = 3
 
 
@@ -46,6 +47,15 @@ class Plotter:
         self.currentLengths = self.startLengths
         self.plotfile = plotfile
         self.pixelsPerStep = .1
+
+    def changeColor(self, color):
+        print("calling change color %d" % color)
+        b = (1 << 6) + color
+        try:
+           self.plotfile.write(chr(b))
+        except (ValueError):
+           print("got value error writing: %s " % b)
+           raise ValueError
 
 
     def drawLineTo(self,p2,pendown):
