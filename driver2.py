@@ -47,15 +47,16 @@ class Driver(Plotter):
                 # print "steppera down"
                 self.steppera.stepdown()
             time.sleep(self.delay)
-
     
 
-stepperb = Stepper()
-steppera = Stepper()
-pen = Servo()
-plotfile = open(sys.argv[1],'rb')
 
-v = Driver(steppera,stepperb,pen,plotfile,0.002)
-v.run()
-print ("done.")
+def BuildDriver(plotfile):
+    stepperb = Stepper()
+    steppera = Stepper()
+    pen = Servo()
+    v = Driver(steppera,stepperb,pen,plotfile,0.002)
+    return v
+
+plotfile = open(sys.argv[1],'rb')
+BuildDriver(plotfile).run()
    
