@@ -4,7 +4,7 @@ from math import sqrt,sin,cos,acos,atan2,degrees,fabs,pow,modf,fmod
 
 from Plotter import Lengths, Point, Plotter
 from servo import Servo
-from stepper import Stepper2
+from stepper2 import Stepper
 
 class Driver(Plotter):
 
@@ -49,10 +49,9 @@ class Driver(Plotter):
             time.sleep(self.delay)
     
 
-
 def BuildDriver(plotfile):
-    stepperb = Stepper()
-    steppera = Stepper()
+    steppera = Stepper(True)
+    stepperb = Stepper(False)
     pen = Servo()
     v = Driver(steppera,stepperb,pen,plotfile,0.002)
     return v

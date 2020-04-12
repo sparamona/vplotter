@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-from Plotter import Lengths,Point,Plotter
+from Plotter import Plotter
 
 
 
@@ -18,10 +18,10 @@ plotter =Plotter(plotfile)
 plotter.reset()
 plotter.drawLineTo( start, False )
 plotter.drawLineTo( Point( start.x+size.x, start.y) , True)
-plotter.drawLineTo( Point( start.x+size.x, start.y + size.y) , True)
-plotter.drawLineTo( Point( start.x, start.y + size.y) , True)
-plotter.drawLineTo( Point( start.x, start.y) , True)
-plotter.reset()
+#plotter.drawLineTo( Point( start.x+size.x, start.y + size.y) , True)
+#plotter.drawLineTo( Point( start.x, start.y + size.y) , True)
+#plotter.drawLineTo( Point( start.x, start.y) , True)
+#plotter.reset()
 
 
 

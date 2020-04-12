@@ -1,20 +1,20 @@
-import adafruit_motorkit as MotorKit
+from adafruit_motorkit import MotorKit
 
 class Stepper:
 
   _stepper = None
   
-  def __init__(isLeft):
-    self._kit = MotorKit()
+  def __init__(self,isLeft):
+    kit = MotorKit()
     if isLeft:
       self._stepper = kit.stepper1
     else:
       self._stepper = kit.stepper2
 
   def stepup(self):
-    self._stepper.onstep()
+    self._stepper.onestep()
 
 
   def stepdown(self):
-    self._stepper.onstep(direction=adafruit_motor.stepper.BACKWARD)
+    self._stepper.onestep(direction=adafruit_motor.stepper.BACKWARD)
 
