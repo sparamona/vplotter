@@ -22,7 +22,7 @@ class Driver(Plotter):
             c = (self.plotfile.read(1))
             if c==b'':
                 break
-            b = bytearray(c)[0]
+            b = c[0]
         
 
             # print "read ", b

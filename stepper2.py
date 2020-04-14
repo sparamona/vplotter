@@ -2,7 +2,6 @@ from adafruit_motorkit import MotorKit
 
 class Stepper:
 
-  _stepper = None
   BACKWARD = 2
   
   def __init__(self,isLeft):

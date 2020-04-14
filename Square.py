@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-from Plotter import Plotter
+from Plotter import Lengths,Point,Plotter
 
 
 

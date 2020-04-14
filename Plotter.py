@@ -50,14 +50,16 @@ class Plotter:
 
     _bytes = bytearray(1)
     def write(self,b):
-        self._bytes[0] = b
-        self.plotfile.write(self._bytes)
+        # skip if it's just a 1 and not moving 
+        if (b>2):
+            self._bytes[0] = b
+            self.plotfile.write(self._bytes)
 
     def changeColor(self, color):
         print("calling change color %d" % color)
         b = (1 << 6) + color
         try:
-           self,write(b)
+           self.write(b)
         except (ValueError):
            print("got value error writing: %s " % b)
            raise ValueError
@@ -137,7 +139,7 @@ class Plotter:
                     lb=lb-steplength
             b = (stepa << 4) + (stepb<<2) + 1
             if stepa==0 and stepb==0:
-                break;
+                break
             self.write(b)
         self.currentLengths=Lengths(la,lb)
 
@@ -165,4 +167,12 @@ class Plotter:
                 raise ValueError
 
         
-
+    def printSteps(self,bts):
+        a=0
+        b=0
+        for s in bts:
+            a+=(s>>4&1)
+            a-=(s>>4&2)
+            b+=(s>>2&1)
+            b-=(s>>2&2)
+        print("a="+str(a)+"; b="+str(b))
