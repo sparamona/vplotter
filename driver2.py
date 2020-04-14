@@ -56,6 +56,8 @@ def BuildDriver(plotfile):
     v = Driver(steppera,stepperb,pen,plotfile,0.002)
     return v
 
-plotfile = open(sys.argv[1],'rb')
-BuildDriver(plotfile).run()
+
+def main():
+    plotfile = open(sys.argv[1],'rb')
+    BuildDriver(plotfile).run()
    

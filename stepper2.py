@@ -3,6 +3,7 @@ from adafruit_motorkit import MotorKit
 class Stepper:
 
   _stepper = None
+  BACKWARD = 2
   
   def __init__(self,isLeft):
     kit = MotorKit()
@@ -16,5 +17,5 @@ class Stepper:
 
 
   def stepdown(self):
-    self._stepper.onestep(direction=adafruit_motor.stepper.BACKWARD)
+    self._stepper.onestep(direction=self.BACKWARD)
 

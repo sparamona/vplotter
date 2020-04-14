@@ -48,11 +48,16 @@ class Plotter:
         self.plotfile = plotfile
         self.pixelsPerStep = .1
 
+    _bytes = bytearray(1)
+    def write(self,b):
+        self._bytes[0] = b
+        self.plotfile.write(self._bytes)
+
     def changeColor(self, color):
         print("calling change color %d" % color)
         b = (1 << 6) + color
         try:
-           self.plotfile.write(chr(b))
+           self,write(b)
         except (ValueError):
            print("got value error writing: %s " % b)
            raise ValueError
@@ -90,7 +95,7 @@ class Plotter:
             b = ((2 if sa<0 else sa) << 4) + ((2 if sb<0 else sb)<<2) + pencommand
             # print "writing ", sa,b
             try:
-                self.plotfile.write(chr(b))
+                self.write(b)
             except (ValueError):
                 print("got value error writing: %s " % b)
                 raise ValueError
@@ -133,7 +138,7 @@ class Plotter:
             b = (stepa << 4) + (stepb<<2) + 1
             if stepa==0 and stepb==0:
                 break;
-            self.plotfile.write(chr(b))
+            self.write(b)
         self.currentLengths=Lengths(la,lb)
 
 
