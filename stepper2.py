@@ -6,15 +6,22 @@ class Stepper:
   
   def __init__(self,isLeft):
     kit = MotorKit()
+    self._isLeft = isLeft
     if isLeft:
-      self._stepper = kit.stepper1
-    else:
       self._stepper = kit.stepper2
+    else:
+      self._stepper = kit.stepper1
 
   def stepup(self):
-    self._stepper.onestep()
-
+    if self._isLeft:
+      self._stepper.onestep()
+    else:
+      self._stepper.onestep(direction=self.BACKWARD)
 
   def stepdown(self):
-    self._stepper.onestep(direction=self.BACKWARD)
+    if self._isLeft:
+      self._stepper.onestep(direction=self.BACKWARD)
+    else:
+      self._stepper.onestep()
+
 

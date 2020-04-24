@@ -35,16 +35,16 @@ class Driver(Plotter):
             if (pen == Driver.DWN):
                 self.pen.down()
             if (sb==Driver.FWD):
-                # print "stepperb up"
+                print("stepperb up")
                 self.stepperb.stepup()
             elif (sb==Driver.REV):
-                # print "stepperb down"
+                print("stepperb down")
                 self.stepperb.stepdown()
             if (sa == Driver.FWD):
-                # print "steppera up"
+                print("steppera up")
                 self.steppera.stepup()
             elif (sa == Driver.REV):
-                # print "steppera down"
+                print("steppera down")
                 self.steppera.stepdown()
             time.sleep(self.delay)
     
@@ -53,7 +53,7 @@ def BuildDriver(plotfile):
     steppera = Stepper(True)
     stepperb = Stepper(False)
     pen = Servo()
-    v = Driver(steppera,stepperb,pen,plotfile,0.002)
+    v = Driver(steppera,stepperb,pen,plotfile,0.02)
     return v
 
 
