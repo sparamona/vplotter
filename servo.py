@@ -5,8 +5,8 @@ class Servo:
 
         _servo = None
         state=1
-        DOWN_ANGLE=45
-        UP_ANGLE=110
+        DOWN_ANGLE=110
+        UP_ANGLE=45
 
         def __init__(self):
           kit = ServoKit(channels=16)

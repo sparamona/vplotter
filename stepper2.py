@@ -16,7 +16,7 @@ class Stepper:
     if self._isLeft:
       self._stepper.onestep()
     else:
-      self._stepper.onestep(direction=self.BACKWARD)
+      self._stepper.onestep(direction=self.BACKWARD, style=2)
 
   def stepdown(self):
     if self._isLeft:
