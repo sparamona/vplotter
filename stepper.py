@@ -36,7 +36,7 @@ class Stepper:
     self.setStep(self.STEPS[self.IDX])
 
   def setStep(self,W):
-    # print("step ", W)
+    #print("step ", W)
     GPIO.output(self.coil_A_1_pin, W[0])
     GPIO.output(self.coil_A_2_pin, W[1])
     GPIO.output(self.coil_B_1_pin, W[2])

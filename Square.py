@@ -11,9 +11,9 @@ plotfile = open(sys.argv[3],'wb')
 margins = [ 250, 100, 250, 300] # left, top, right down
 totalarea = (1200, 1700)
 
-start=Point( totalarea[0]/2-size.x/2, margins[1]+300)
-
 plotter =Plotter(plotfile)
+origin = plotter.pointFromLengths(plotter.currentLengths)
+start = Point(origin.x-size.x/2,origin.y+20)
 
 plotter.reset()
 plotter.drawLineTo( start, False )

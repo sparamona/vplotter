@@ -5,8 +5,8 @@ class Servo:
 
         _servo = None
         state=1
-        DOWN_ANGLE=110
-        UP_ANGLE=45
+        DOWN_ANGLE=67
+        UP_ANGLE=60
 
         def __init__(self):
           kit = ServoKit(channels=16)
@@ -17,12 +17,12 @@ class Servo:
         def down(self):
           if (self.state==1):
                   return
-          self._servo.angle=self.UP_ANGLE
+          self._servo.angle=self.DOWN_ANGLE
           self.state=1
 
         def up(self):
           if (self.state==0):
                   return
-          self._servo.angle=self.DOWN_ANGLE
+          self._servo.angle=self.UP_ANGLE
           self.state=0
 
