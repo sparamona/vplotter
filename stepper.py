@@ -18,21 +18,39 @@ class Stepper:
     GPIO.setup(coil_B_2_pin, GPIO.OUT)
 
     GPIO.output(enable_pin, 1)
-    self.STEPS = [ [1,0,1,0], [0,1,1,0], [0,1,0,1], [1,0,0,1] ]
+    #self.FULL_STEPS = [ [1,0,1,0], [0,1,1,0], [0,1,0,1], [1,0,0,1] ]
+    self.FULL_STEPS = [ [0,0,1,0], [0,1,0,0], [0,0,0,1], [1,0,0,0] ]
+
+    self.MICRO_STEPS = [
+      [1,0,0,0],
+      [1,0,1,0],
+      [0,0,1,0],
+      [0,1,1,0],
+      [0,1,0,0],
+      [0,1,0,1],
+      [0,0,0,1],
+      [1,0,0,1]      
+    ]
+
+    ## PICK STEPS OR MICROSTEPS
+    self.STEPS = self.MICRO_STEPS
+    self.NSTEPS = len(self.STEPS)
+ 
     self.IDX = 0
+
 
   def step(self,direction):
     if (direction == 0):
       return
-    self.IDX= (self.IDX + 1*direction) % 4
+    self.IDX= (self.IDX + 1*direction) % self.NSTEPS
     self.setStep(self.STEPS[self.IDX])
 
   def stepup(self):
-    self.IDX= (self.IDX + 1) % 4
+    self.IDX= (self.IDX + 1) % self.NSTEPS
     self.setStep(self.STEPS[self.IDX])
 
   def stepdown(self):
-    self.IDX= (self.IDX - 1) % 4
+    self.IDX= (self.IDX - 1) % self.NSTEPS
     self.setStep(self.STEPS[self.IDX])
 
   def setStep(self,W):

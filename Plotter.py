@@ -37,16 +37,22 @@ class Plotter:
     BLACK = 3
 
 
+    PIXELS_PER_INCH = 25.40
+    
     def __init__(self, plotfile):
+        
         #self.W = 942.975                                # 37.125"  -- distance between the motor points, 25.40 pixels per inch
-        self.W = 1219.2
-        self.stepLength = .16                           # distance the belt moves per step      
+        self.W = 48*Plotter.PIXELS_PER_INCH
+        
+        self.stepLength = .00314*Plotter.PIXELS_PER_INCH         # MICROSTEPS => 6.28" for 2000 steps ==> .00314" per step
+                                                         # distance the belt moves per step      
         #self.startLengths = Lengths(508.0,508.0)        # Starting point (arbitrary, but should be roughly correct)
-        self.startLengths = Lengths(700.0,700.0)        # Starting point (arbitrary, but should be roughly correct)
+        self.startLengths = Lengths(676.0,676.0)        # Starting point (arbitrary, but should be roughly correct)
         #self.currentLengths = Lengths(508.0,508.0)  
         self.currentLengths = self.startLengths
         self.plotfile = plotfile
-        self.pixelsPerStep = .1
+        #self.pixelsPerStep = .1
+        self.pixelsPerStep = self.stepLength # not sure why this is different
 
     _bytes = bytearray(1)
     def write(self,b):
