@@ -19,6 +19,7 @@ class Servo:
                   return
           self._servo.angle=self.DOWN_ANGLE
           self.state=1
+          time.sleep(0.1)
 
         def up(self):
           if (self.state==0):
