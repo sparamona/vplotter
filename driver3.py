@@ -51,7 +51,7 @@ def BuildDriver(plotfile):
     steppera = Stepper(16, 15,17,27,14)
     stepperb = Stepper(16, 22,23,24,25)
     pen = Servo()
-    v = Driver(steppera,stepperb,pen,plotfile,0.004)
+    v = Driver(steppera,stepperb,pen,plotfile,0.003)
     return v
 
 
