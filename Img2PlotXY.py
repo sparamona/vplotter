@@ -240,12 +240,12 @@ class Img2Plot(Plotter):
 #
 
 sourcefile = sys.argv[1]
-plotfile = open(sys.argv[2],'w')
+plotfile = open(sys.argv[2],'wb')
 shadelevels = [float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6])]
 
 
 image = Image.open(sourcefile)
-margins = [ 250, 250, 250, 300] # left, top, right down
+margins = [ 305, 300, 305, 500] # left, top, right down
 totalarea = (1200, 1700)
 plotarea = (margins[0],margins[1],totalarea[0]-margins[2],totalarea[1]-margins[3])
 
@@ -253,7 +253,18 @@ plotarea = (margins[0],margins[1],totalarea[0]-margins[2],totalarea[1]-margins[3
 v = Img2Plot(image,plotfile,plotarea, shadelevels)
 #shadelevels = v.detectShades(float(shadescale))
 
+
 v.draw()
+
+#v.drawLineTo(Point(margins[0],margins[1]), False)
+#v.drawLineTo(Point(margins[0],totalarea[0]-margins[2]), True)
+#v.drawLineTo(Point(totalarea[0]-margins[2],margins[1]), True)
+#v.drawLineTo(Point(totalarea[0]-margins[2],totalarea[1]-margins[3]), True)
+#v.drawLineTo(Point(margins[0],totalarea[1]-margins[3]), True)
+#v.drawLineTo(Point(margins[0],margins[1]), True)
+
+v.drawLineTo(Point(margins[0],margins[1]), False)
+v.reset()
 
 print ("done.")
    

@@ -55,7 +55,7 @@ class Plotter:
         self.pixelsPerStep = self.stepLength # not sure why this is different
 
     _bytes = bytearray(1)
-    def write(self,b):
+    def write2(self,b):
         # skip if it's just a 1 and not moving 
         if (b>2):
             self._bytes[0] = b
@@ -103,7 +103,7 @@ class Plotter:
             b = ((2 if sa<0 else sa) << 4) + ((2 if sb<0 else sb)<<2) + pencommand
             # print "writing ", sa,b
             try:
-                self.write(b)
+                self.write2(b)
             except (ValueError):
                 print("got value error writing: %s " % b)
                 raise ValueError
@@ -146,7 +146,7 @@ class Plotter:
             b = (stepa << 4) + (stepb<<2) + 1
             if stepa==0 and stepb==0:
                 break
-            self.write(b)
+            self.write2(b)
         self.currentLengths=Lengths(la,lb)
 
 
