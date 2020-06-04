@@ -1,8 +1,8 @@
-#!/usr/bin/env python
 import sys,collections,gc,time
 from math import sqrt,sin,cos,acos,atan2,degrees,fabs,pow,modf,fmod
 from Plotter import Lengths,Point,Plotter
 from PIL import Image, ImageEnhance
+import random
 
 def inbox(p,box):
     return (p.x>=box[0]) and (p.x<=box[2]) and (p.y>=box[1]) and (p.y<=box[3])
@@ -86,10 +86,12 @@ class Img2Plot(Plotter):
         print ("auto leveled for %s" % (shadelevels))
 
         self.shades = { 
-            MODES.EW: (minshade,int(shadelevels[0])),  
-            MODES.NS: (minshade,int(shadelevels[1])), 
-            MODES.NWSE: (minshade,int(shadelevels[2])), 
-            MODES.NESW: (minshade,int(shadelevels[3]))} 
+            MODES.EW:   (minshade, int(shadelevels[0]), False, 0),  
+            MODES.NS:   (minshade, int(shadelevels[1]), False, 0), 
+            MODES.NESW: (minshade, int(shadelevels[2]), False, 0),
+            MODES.NWSE: (minshade, int(shadelevels[3]), True, (shadelevels[2]+shadelevels[3])/2) 
+            } 
+            
 
         #self.image.save("out.png","PNG")
         
@@ -162,6 +164,7 @@ class Img2Plot(Plotter):
         for i in r:
             commands = self.sweep1(mode,i)
             fwd = self.write(commands,fwd)
+        print("")
         print("done sweeping")
         return
 
@@ -188,6 +191,7 @@ class Img2Plot(Plotter):
         def offpage(p):
             return ((p.x>self.imageArea[2]) or (p.y>self.imageArea[3]))
 
+        print(".",end="",flush=True)
         points = []
         p = MODES.start(mode,i,self.imageArea)
         delta = (MODES.stepDelta(mode)[0]*self.stepLength/2.0,
@@ -199,7 +203,10 @@ class Img2Plot(Plotter):
         inline = False
         startingOffpage = offpage(p)
         _from = p
+        dashsize = 0
+        dashon = True
         while startingOffpage or not(offpage(p)):
+            
             if not(offpage(p)):
                 startingOffpage=False
             #print p
@@ -210,23 +217,46 @@ class Img2Plot(Plotter):
                 break
             if _inbox:
                 pix = self.image.getpixel((p.x-offset.x,p.y-offset.y))
-                pencommand = 2 if (pix>vrange[0] and pix<=vrange[1]) else 1
+
+
+
+                #pencommand = 2 if (pix>vrange[0] and pix<=vrange[1] and (vrange[2]==False or random.randint(vrange[3],vrange[1]) > pix)) else 1  # 2 down, 1 up
+
+                pencommand = 1
+                if (pix>vrange[0] and pix<=vrange[1]):
+                    if (vrange[2]==False):
+                        pencommand = 2
+                    elif dashsize > 0:
+                        pencommand = 2 if dashon else 1
+                        dashsize = dashsize - 1
+                    elif (random.randint(vrange[3],vrange[1]) > pix):
+                        pencommand = 2
+                        dashsize = random.randint(5,10)
+                        dashon = True
+                    else:
+                        pencommand = 1
+                        dashsize = 8 # random.randint(5,10)
+                        dashon = False
+                    
+                
                 if (pencommand==2 and inline==False):
                     # now check to see if the last line was within 2 steps max(X,Y)
                     _from=p
-                    if (len(points)>0):
+                    if (len(points)>0 and vrange[2]==False):
                         lastpoint = points[-1]
                         if max(p.x-lastpoint[1].x,p.y-lastpoint[1].y)<2.0*self.stepLength:
                             #reset _from
                             #print "resetting"
                             points.pop()
-                            _from=lastpoint[0]
+                            _from=lastpoint[0]                      
                     inline=True
                 if (pencommand==1 and inline==True):
                     points.append((_from,p))
                     inline=False
             p = Point(p.x+delta[0],p.y+delta[1])
-
+            if (delta[0]==0 and delta[1]==0):
+                print("deltas are zero")
+                break
         #close a line
         if (inline==True):
             points.append((_from,p))
@@ -263,8 +293,8 @@ v.draw()
 #v.drawLineTo(Point(margins[0],totalarea[1]-margins[3]), True)
 #v.drawLineTo(Point(margins[0],margins[1]), True)
 
-v.drawLineTo(Point(margins[0],margins[1]), False)
-v.reset()
+#v.drawLineTo(Point(margins[0],margins[1]), False)
+#v.reset()
 
 print ("done.")
    
