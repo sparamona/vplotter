@@ -275,7 +275,7 @@ shadelevels = [float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]), float
 
 
 image = Image.open(sourcefile)
-margins = [ 305, 300, 305, 500] # left, top, right down
+margins = [ 200, 300, 200, 500] # left, top, right down
 totalarea = (1200, 1700)
 plotarea = (margins[0],margins[1],totalarea[0]-margins[2],totalarea[1]-margins[3])
 
